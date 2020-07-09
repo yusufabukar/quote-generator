@@ -28,6 +28,7 @@ async function getQuote() {
 		if (queryLimit > 19) {
 			quoteText.innerText = 'Error Retrieving Quote. Please refresh or try again later.';
 			authorText.innerText = 'System';
+			newQuoteButton.innerText = 'Refresh';
 		} else {
 			const response = await fetch(proxy + api);
 			const data = await response.json();
@@ -58,13 +59,20 @@ async function getQuote() {
 function tweetQuote() {
 	const quote = quoteText.innerText;
 	const author = authorText.innerText;
-	const twitter = `https://twitter.com/intent/tweet?text=${quote} - ${author}`;
+	const twitter = `https://twitter.com/intent/tweet?text="${quote}" - ${author}`;
 	window.open(twitter, '_blank');
 };
 
 // Event Listeners
 twitterButton.addEventListener('click', tweetQuote);
-newQuoteButton.addEventListener('click', getQuote);
+newQuoteButton.addEventListener('click', function() {
+	if (queryLimit <= 19) {
+		getQuote();
+	} else {
+		newQuoteButton.innerText = 'Refresh';
+		window.location.reload();
+	};
+});
 
 // Grab quote on load
 getQuote();
