@@ -20,8 +20,8 @@ function removeLoader() {
 
 async function getQuote() {
 	showLoader();
-	const proxy = 'https://cors-anywhere.herokuapp.com/';
-	const api = 'http://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=json';
+
+	const api = 'https://type.fit/api/quotes';
 
 	try {
 		// Limit API call retries and display error message
@@ -30,28 +30,31 @@ async function getQuote() {
 			authorText.innerText = 'System';
 			newQuoteButton.innerText = 'Refresh';
 		} else {
-			const response = await fetch(proxy + api);
-			const data = await response.json();
+			const response = await fetch(api);
+			const quotes = await response.json();
+			const quote = quotes[Math.ceil(Math.random() * Math.floor(quotes.length))];
 
 			// Reduce font size for long quotes
-			if (data.quoteText.length > 120) {
+			if (quote.text.length > 120) {
 				quoteText.classList.add('quote-long');
 			} else {
 				quoteText.classList.remove('quote-long');
 			};
-			quoteText.innerText = data.quoteText;
+			quoteText.innerText = quote.text;
 
-			if (data.quoteAuthor === '') {
+			if (quote.author === '') {
 				authorText.innerText = 'Unknown';
+			} else if (quote.author === 'Ralph Emerson') {
+				quote.author = 'Ralph Waldo Emerson';
 			} else {
-				authorText.innerText = data.quoteAuthor;
+				authorText.innerText = quote.author;
 			};
 		};
 		
 		removeLoader();
 	} catch (error) {
 		queryLimit++;
-		console.log('Error Retrieving Quote', error);
+		console.log(error);
 		getQuote();
 	};
 };
@@ -60,6 +63,7 @@ function tweetQuote() {
 	const quote = quoteText.innerText;
 	const author = authorText.innerText;
 	const twitter = `https://twitter.com/intent/tweet?text="${quote}" - ${author}`;
+
 	window.open(twitter, '_blank');
 };
 
